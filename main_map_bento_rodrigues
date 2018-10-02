@@ -1,0 +1,46 @@
+// Satelite image that i´m using: USGS Landsat 8 Collection 1 Tier 1 and Real-Time data TOA Reflectance
+// using the GEE Console
+
+//////////////// Constants ////////////////
+// set the color variable, which are bands from my dataset
+var RGB_VIS = {min: 0, max: 0.3, gamma: 1.5, bands: ['B4', 'B3', 'B2']};
+
+//////////////// Analysis ////////////////
+// seting the two date filter variables.
+var filtered_after = L8.filterDate('2016-06-01', '2016-09-30');
+var fitered_before = L8.filterDate('2014-06-01', '2014-09-30')
+
+
+// a satelite takes 15 days to go around the world, I´ve chose between lots of days also to get the less cloudy image in both days.
+
+//////////////// User Interface ////////////////
+// creating the maps:
+
+var map1 = ui.Map();                                    // create an map
+map1.add(ui.Panel({                                     // A widget that can hold other widgets. Use panels to construct complex combinations of nested widgets
+  widgets:[ui.Label('Antes do rompimento (06/2014)')],  // inserting a label
+  style: {position: 'bottom-left'}                      // defining position
+}));
+map1.addLayer(fitered_before.median(), RGB_VIS, 'RGB'); // when i add a layer is when i put the satelite image on my map
+
+// now i´m doing the same thing with data after the dam rupture
+
+var map2 = ui.Map();
+map2.add(ui.Panel({
+  widgets:[ui.Label('Depois do rompimento (06/2016)')],
+  style: {position: 'bottom-right'}
+}));
+map2.addLayer(filtered_after.median(), RGB_VIS, 'RGB');
+
+// Link the two maps.
+var linker = ui.Map.Linker([map1,map2]);
+
+// Make a split map.
+var splitMap = ui.SplitPanel({
+  firstPanel: map1,
+  secondPanel: map2,
+  wipe: true,
+});
+
+ui.root.widgets().reset([splitMap]);        // spliting the map
+map1.setCenter(-43.417925,-20.234788, 12);  // coordinators from where I want the map to show
